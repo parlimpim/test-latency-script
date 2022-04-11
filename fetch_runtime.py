@@ -51,6 +51,20 @@ def fetch_runtime(host=None, org_id=None, token=None):
     }
     response = requests.post(endpoint, headers=headers, data=json.dumps(data))
 
+def fetch_runtime_globalarch(host=None, org_id=None, token=None):
+    endpoint = f'{host}/api/2/{org_id}/rest/pm/runtime/globalarch'
+    headers = {
+        'Authorization': token,
+        'Content-Type': 'application/json; charset=UTF-8',
+    }
+    data = {
+        "state": "Completed,Stopped,Failed",
+        "offset": 0,
+        "limit": 0,
+        "is_globalarch": True,
+    }
+    response = requests.post(endpoint, headers=headers, data=json.dumps(data))
+
 def login(host:str, username: str, password: str):
     path = '/api/1/rest/asset/session'
     params = {"caller": username}
@@ -97,14 +111,16 @@ token = login(org_host, username, password)
 org_org_id = get_orgsnid(org_host, username, token, org_org_name)
 sgp_org_id = get_orgsnid(org_host, username, token, sgp_org_name)
 data = []
-columns = ['backend server location', 'organization data', 'time (secs)']
+columns = ['endpoint','backend server location', 'organization data', 'time (secs)']
 
 # oregon
 print('data org singapore')
 print('oregon')
 token = login(org_host, username, password)
-print(evaluate(fetch_runtime, host=org_host, org_id=sgp_org_id, token=token, backend_server_location=org_org_name, organization_data=sgp_org_name))
-print(evaluate(fetch_runtime, host=org_host, org_id=sgp_org_id, token=token, backend_server_location=org_org_name, organization_data=org_org_name))
+print(evaluate(fetch_runtime, host=org_host, org_id=sgp_org_id, token=token, backend_server_location=org_org_name, organization_data=sgp_org_name, endpoint='/runtime'))
+print(evaluate(fetch_runtime, host=org_host, org_id=sgp_org_id, token=token, backend_server_location=org_org_name, organization_data=org_org_name, endpoint='/runtime'))
+print(evaluate(fetch_runtime_globalarch, host=org_host, org_id=sgp_org_id, token=token, backend_server_location=org_org_name, organization_data=sgp_org_name, endpoint='/runtime/globalarch'))
+print(evaluate(fetch_runtime_globalarch, host=org_host, org_id=sgp_org_id, token=token, backend_server_location=org_org_name, organization_data=org_org_name, endpoint='/runtime/globalarch'))
 # print(evaluate(get_status, host=org_host))
 
 # singapore
