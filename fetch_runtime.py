@@ -3,6 +3,7 @@ import json
 import time
 import numpy as np
 import pandas as pd
+import sys
 
 def create_pipeline(host: str, org_id: str, token: str, name: str):
     endpoint = f'{host}/api/2/{org_id}/rest/pipeline/create'
@@ -103,8 +104,8 @@ N = 10
 
 username = 'admin@snaplogic.com'
 password = 'Ephemeral$123'
-org_host = 'http://34.219.225.120'
-# sgp_host = 'http://a78190262484549cba57734ba6422e06-1845222303.ap-southeast-1.elb.amazonaws.com'
+org_host = sys.argv[1]
+sgp_host = sys.argv[2]
 org_org_name = 'oregon'
 sgp_org_name = 'singapore'
 token = login(org_host, username, password)
@@ -114,20 +115,20 @@ data = []
 columns = ['endpoint','backend server location', 'organization data', 'time (secs)']
 
 # oregon
-print('data org singapore')
 print('oregon')
 token = login(org_host, username, password)
 print(evaluate(fetch_runtime, host=org_host, org_id=sgp_org_id, token=token, backend_server_location=org_org_name, organization_data=sgp_org_name, endpoint='/runtime'))
-print(evaluate(fetch_runtime, host=org_host, org_id=sgp_org_id, token=token, backend_server_location=org_org_name, organization_data=org_org_name, endpoint='/runtime'))
+print(evaluate(fetch_runtime, host=org_host, org_id=org_org_id, token=token, backend_server_location=org_org_name, organization_data=org_org_name, endpoint='/runtime'))
 print(evaluate(fetch_runtime_globalarch, host=org_host, org_id=sgp_org_id, token=token, backend_server_location=org_org_name, organization_data=sgp_org_name, endpoint='/runtime/globalarch'))
-print(evaluate(fetch_runtime_globalarch, host=org_host, org_id=sgp_org_id, token=token, backend_server_location=org_org_name, organization_data=org_org_name, endpoint='/runtime/globalarch'))
-# print(evaluate(get_status, host=org_host))
+print(evaluate(fetch_runtime_globalarch, host=org_host, org_id=org_org_id, token=token, backend_server_location=org_org_name, organization_data=org_org_name, endpoint='/runtime/globalarch'))
 
 # singapore
-# print('singapore')
-# token = login(sgp_host, username, password)
-# print(evaluate(fetch_runtime, host=sgp_host, org_id=sgp_org_id, token=token, backend_server_location=sgp_org_name, organization_data=sgp_org_name))
-# print(evaluate(get_status, host=sgp_host))
+print('singapore')
+token = login(sgp_host, username, password)
+print(evaluate(fetch_runtime, host=sgp_host, org_id=sgp_org_id, token=token, backend_server_location=sgp_org_name, organization_data=sgp_org_name, endpoint='/runtime'))
+print(evaluate(fetch_runtime, host=sgp_host, org_id=org_org_id, token=token, backend_server_location=sgp_org_name, organization_data=org_org_name, endpoint='/runtime'))
+print(evaluate(fetch_runtime_globalarch, host=sgp_host, org_id=sgp_org_id, token=token, backend_server_location=sgp_org_name, organization_data=sgp_org_name, endpoint='/runtime/globalarch'))
+print(evaluate(fetch_runtime_globalarch, host=sgp_host, org_id=org_org_id, token=token, backend_server_location=sgp_org_name, organization_data=org_org_name, endpoint='/runtime/globalarch'))
 
 df = pd.DataFrame(data=data, columns=columns)
 df.to_csv('result.csv')

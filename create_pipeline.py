@@ -1,5 +1,6 @@
 import requests
 import json
+import sys
 import pymongo_sl
 from pymongo_sl.cache_client import LocalCacheClient
 
@@ -62,7 +63,7 @@ def get_orgsnid(username: str, org_name: str):
 
 username = 'admin@snaplogic.com'
 password = 'Ephemeral$123'
-host = 'http://34.219.225.120'
+host = sys.argv[1]
 
 token = login(username, password)
 sgp_org_name = 'singapore'
@@ -73,33 +74,25 @@ org_org_id = get_orgsnid(username, org_org_name)
 # print(token)
 
 # create pipline runtime
-# n = 3
-# for i in range(1,n+1):
-#     sgp_pipeline_name = f'sgp {i}'
-#     sgp_pipeline_id = create_pipeline(sgp_org_id, sgp_pipeline_name, sgp_org_name)
-#     update_pipeline(sgp_org_id, sgp_pipeline_name, sgp_pipeline_id)
-#     create_runtime(sgp_pipeline_id, sgp_org_name)
+n = 5
+for i in range(1,n+1):
+    sgp_pipeline_name = f'sgp {i}'
+    sgp_pipeline_id = create_pipeline(sgp_org_id, sgp_pipeline_name, sgp_org_name)
+    update_pipeline(sgp_org_id, sgp_pipeline_name, sgp_pipeline_id)
+    create_runtime(sgp_pipeline_id, sgp_org_name)
 
-#     org_pipeline_name = f'org {i}'
-#     org_pipeline_id = create_pipeline(org_org_id, org_pipeline_name, org_org_name)
-#     update_pipeline(org_org_id, org_pipeline_name, org_pipeline_id)
-#     create_runtime(org_pipeline_id, org_org_name)
+    org_pipeline_name = f'org {i}'
+    org_pipeline_id = create_pipeline(org_org_id, org_pipeline_name, org_org_name)
+    update_pipeline(org_org_id, org_pipeline_name, org_pipeline_id)
+    create_runtime(org_pipeline_id, org_org_name)
 
-# set sharding
-mongo_host = "localhost"
+# add region
+mongo_host = sys.argv[2]
 
 cache_client = LocalCacheClient()
 client = pymongo_sl.MongoClientSL(host=mongo_host, port=27017, cache_client=cache_client)
 slserver_db = client["slserver"]
 pipeline_rt = slserver_db["pm.pipeline_rt"]
 
-# pipeline_rt.update_many({"org_snode_id": sgp_org_id}, {"$set": {"region": "singapore"}})
-# pipeline_rt.update_many({"org_snode_id": org_org_id}, {"$set": {"region": "oregon"}})
-# pipeline_rt.create_index([("region", 1), ("_id", "hashed")])
-
-# slserver_db.command('enableSharding',"slserver_db")
-# slserver_db.command('shardCollection', "slserver", {"region": 1, "_id": "hashed"})
-# slserver_db.command('addShardTag', { "us-west-2", "oregon" })
-# slserver_db.command('addShardTag', { "ap-southeast-1", "singapore" })
-# slserver_db.command('addTagRange', "pipeline_rt", { {"region": "oregon", "_id": 0}, {"region": "oregon", "_id": 9999}, "oregon"} )
-# slserver_db.command('addTagRange', "pipeline_rt", { {"region": "singapore", "_id": 0}, {"region": "singapore", "_id": 9999}, "singapore"} )
+pipeline_rt.update_many({"org_snode_id": sgp_org_id}, {"$set": {"region": "singapore"}})
+pipeline_rt.update_many({"org_snode_id": org_org_id}, {"$set": {"region": "oregon"}})
