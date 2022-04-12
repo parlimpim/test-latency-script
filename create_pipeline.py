@@ -1,8 +1,7 @@
 import requests
 import json
 import sys
-import pymongo_sl
-from pymongo_sl.cache_client import LocalCacheClient
+from pymongo import MongoClient
 
 def create_pipeline(org_id: str, name: str, org_name: str):
     endpoint = f'{host}/api/2/{org_id}/rest/pipeline/create'
@@ -89,10 +88,8 @@ for i in range(1,n+1):
 # add region
 mongo_host = sys.argv[2]
 
-cache_client = LocalCacheClient()
-client = pymongo_sl.MongoClientSL(host=mongo_host, port=27017, cache_client=cache_client)
+client = MongoClient(host=mongo_host, port=27017)
 slserver_db = client["slserver"]
 pipeline_rt = slserver_db["pm.pipeline_rt"]
-
 pipeline_rt.update_many({"org_snode_id": sgp_org_id}, {"$set": {"region": "singapore"}})
 pipeline_rt.update_many({"org_snode_id": org_org_id}, {"$set": {"region": "oregon"}})
